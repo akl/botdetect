@@ -7,7 +7,7 @@ all:	compile
 	
 
 compile:
-	go build -tags netgo -v -a \
+	go build -tags netgo -v \
 	  -ldflags "-s -X main.Version=$(VERSION) -X main.BuildDate=$(BUILD) -X main.BuildHost=$(HOST)" \
 		./cmd/botdetect/
 

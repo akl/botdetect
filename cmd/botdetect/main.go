@@ -23,14 +23,12 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/elcamino/botdetect"
-
-	"net"
-
 	"github.com/namsral/flag"
 )
 
@@ -45,9 +43,6 @@ var (
 	maxRatio         = flag.Float64("max-ratio", 0.85, "blacklist IPs if the app/assets ratio is above this threshold")
 	showVersion      = flag.Bool("version", false, "Show the program version")
 	trace            = flag.Bool("trace", false, "trace the decisions the program makes")
-
-	privateIPBlocks []*net.IPNet
-	cookieKeyBin    []byte
 
 	// Version contains the program version
 	Version string
@@ -73,6 +68,11 @@ func traceLog(msg string, args ...interface{}) {
 
 func main() {
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("%s %s, built at %s on %s\n", os.Args[0], Version, BuildDate, BuildHost)
+		os.Exit(0)
+	}
 
 	traceLog(strings.Join(os.Environ(), "\n"))
 

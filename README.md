@@ -12,7 +12,8 @@ Please note that this is only a starting point for a bot blocker that you can us
 Integration into Apache
 ------------------------
 
-botdetect can be easily integrated into the apache webserver through mod_rewrite's 
+botdetect can be easily integrated into the apache webserver through mod_rewrite's "prg" interface that
+lets an external program decide the outcome of a RewriteCond operation:
 
 
 ```
@@ -21,8 +22,8 @@ LoadModule rewrite_module /usr/lib/apache2/modules/mod_rewrite.so
 RewriteEngine on
 RewriteMap blmap prg:/usr/local/bin/botdetect
 
-RewriteCond %{REQUEST_URI} !.html
-RewriteCond ${blmap:%{REMOTE_ADDR}|%{HTTP:X-FORWARDED-FOR}} =BLOCK
+RewriteCond %{REQUEST_URI} .html$
+RewriteCond ${blmap:%{REMOTE_ADDR}|%{HTTP:X-FORWARDED-FOR}|%{REQUEST_URI}} =BLOCK
 RewriteRule (.*) "-" [F]
 ```
 

@@ -34,7 +34,7 @@ type Blacklist map[string]bool
 type History struct {
 	options          *HistoryOptions
 	data             map[string]*list.List
-	blacklist        *Blacklist
+	blacklist        Blacklist
 	reqChan          chan *Request
 	ctx              context.Context
 	mutex            sync.RWMutex
@@ -74,7 +74,7 @@ func NewHistory(ctx context.Context, options *HistoryOptions) *History {
 	h := &History{
 		options:     options,
 		data:        make(map[string]*list.List),
-		blacklist:   new(Blacklist),
+		blacklist:   Blacklist{},
 		reqChan:     make(chan *Request),
 		ctx:         ctx,
 		mutex:       sync.RWMutex{},
@@ -100,7 +100,7 @@ func (h *History) Blacklist() Blacklist {
 	h.blmutex.RLock()
 	defer h.blmutex.RUnlock()
 
-	return *(h.blacklist)
+	return h.blacklist
 }
 
 func (h *History) setTimestamp(slot time.Duration) {
@@ -128,7 +128,7 @@ func (h *History) IsBlacklisted(ip string) bool {
 	h.blmutex.RLock()
 	defer h.blmutex.RUnlock()
 
-	_, blacklisted := (*h.blacklist)[ip]
+	_, blacklisted := h.blacklist[ip]
 	return blacklisted
 }
 
@@ -182,7 +182,7 @@ func (h *History) calculate(updateInterval time.Duration) {
 			return
 		case <-time.After(updateInterval):
 			cutoff := time.Now().Add(-1 * h.options.Window)
-			blacklist := new(Blacklist)
+			blacklist := Blacklist{}
 
 			// pretty.Println(h.data)
 			h.mutex.Lock()
@@ -214,7 +214,7 @@ func (h *History) calculate(updateInterval time.Duration) {
 
 				// fmt.Printf("app: %d/%d, ratio: %.2f/%.2f\n", app, h.options.MaxRequests, float64(total)/float64(app), h.options.MaxRatio)
 				if app > h.options.MaxRequests && float64(total)/float64(app) > h.options.MaxRatio {
-					(*blacklist)[ip] = true
+					blacklist[ip] = true
 				}
 			}
 			h.mutex.Unlock()

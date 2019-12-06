@@ -91,6 +91,8 @@ func main() {
 
 	scanner := bufio.NewScanner(os.Stdin)
 
+	reqChan := history.RequestChannel()
+
 	for scanner.Scan() {
 		line := scanner.Text()
 		traceLog("processing '%s'", line)
@@ -103,23 +105,29 @@ func main() {
 		}
 		remote := fields[0]
 		xff := fields[1]
+		url := strings.Join(fields[2:], "|")
 
-		ips := []string{}
+		ips := []net.IP{}
 		if remote := parseIP(remote); remote != nil && !privIP.IsPrivate(remote) {
 			traceLog("adding remote IP: %s", remote.String())
-			ips = append(ips, remote.String())
+			ips = append(ips, remote)
 		}
 
 		for _, xff := range strings.Split(xff, ",") {
 			if parsedIP := parseIP(strings.TrimSpace(xff)); parsedIP != nil && !privIP.IsPrivate(parsedIP) {
-				ips = append(ips, parsedIP.String())
+				ips = append(ips, parsedIP)
 				traceLog("adding X-Forwarded-For IP: %s", parsedIP.String())
 			}
 		}
 
 		decision := ok
 		for i, ip := range ips {
-			blacklisted := history.IsBlacklisted(ip)
+			reqChan <- &botdetect.Request{
+				URL: url,
+				IP:  ip,
+			}
+
+			blacklisted := history.IsBlacklisted(ip.String())
 			traceLog("[%d] ip: %s, blacklisted: %v", i, ip, blacklisted)
 
 			if blacklisted {

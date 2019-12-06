@@ -1,9 +1,10 @@
 Botdetect
 ===
 
-botdetect is a small program that reads IPs on STDIN in the form IP1|IP2 and calculates which IP 
-produces too many requests where the ratio between HTML requests an asset requests (images, CSS, Javascript, fonts)
-leans too far in favour of HTML.
+botdetect is a small program that reads IPs and an URI Path on STDIN in the form IP1|IP2|PATH, 
+e.g. "192.168.12.3|34.88.27.218|/index.html" and calculates which IP produces too many requests 
+where the ratio between HTML requests an asset requests (images, CSS, Javascript, fonts) leans too far 
+in favour of HTML.
 
 Assuming that bad bots usually don't load assets, this is a relatively straight-forward way of detecting bad bots.
 

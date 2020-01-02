@@ -38,11 +38,9 @@ Usage
 ```
 botdetect [options]
 
-  -ignore-private-ips=true: igore private IPs when building the checksum
   -interval=5s: build a new blacklist after this much time
   -max-ratio=0.85: blacklist IPs if the app/assets ratio is above this threshold
   -max-requests=30: maximum number of requests to allow
-  -timeout=10ms: wait this long for a redis response
   -timeslot=1m0s: the duration to use to group requests
   -timestamp-format="15:04": the key by which to group requests (golang time format, default: hour:minute)
   -trace=false: trace the decisions the program makes
